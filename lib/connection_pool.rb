@@ -89,7 +89,7 @@ class ConnectionPool
     #puts "Thread #{Thread.current.object_id} checking IN (current count is #{::Thread.current[@key_count]})"
     if ::Thread.current.thread_variable_get(@key)
       if ::Thread.current.thread_variable_get(@key_count) == 1
-        @available.push(::Thread.thread_variable_get(@key))
+        @available.push(::Thread.current.thread_variable_get(@key))
         ::Thread.current.thread_variable_set(@key, nil)
       else
         the_count = ::Thread.current.thread_variable_get(@key_count)
