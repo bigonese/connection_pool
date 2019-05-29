@@ -69,25 +69,31 @@ class ConnectionPool
 
   def checkout(options = {})
     #puts "Thread #{Thread.current.object_id} checking OUT (current count is #{::Thread.current[@key_count]})"
-    if ::Thread.current[@key]
-      ::Thread.current[@key_count] += 1
-      ::Thread.current[@key]
+    if ::Thread.current.thread_variable_get(@key)
+      the_count = ::Thread.current.thread_variable_get(@key_count) || 0
+      ::Thread.current.thread_variable_set(@key_count, the_count + 1)
+      ::Thread.current.thread_variable_get(@key)
     else
-      ::Thread.current[@key_count] = 1
-      ::Thread.current[@key] = @available.pop(options[:timeout] || @timeout)
+      ::Thread.current.thread_variable_set(@key_count, 1)
+      ::Thread.current.thread_variable_set(@key, @available.pop(options[:timeout] || @timeout))
     end
   end
 
   def checkin
-    puts "ERROR-"*15 unless ::Thread.current[@key]
-    puts caller.join("\n") unless ::Thread.current[@key]
+    unless ::Thread.current.thread_variable_get(@key)
+      puts "ERROR-"*15 
+      puts "Thread #{::Thread.current.object_id}"
+      puts caller.join("\n")
+      puts
+    end
     #puts "Thread #{Thread.current.object_id} checking IN (current count is #{::Thread.current[@key_count]})"
-    if ::Thread.current[@key]
-      if ::Thread.current[@key_count] == 1
-        @available.push(::Thread.current[@key])
-        ::Thread.current[@key] = nil
+    if ::Thread.current.thread_variable_get(@key)
+      if ::Thread.current.thread_variable_get(@key_count) == 1
+        @available.push(::Thread.thread_variable_get(@key))
+        ::Thread.current.thread_variable_set(@key, nil)
       else
-        ::Thread.current[@key_count] -= 1
+        the_count = ::Thread.current.thread_variable_get(@key_count)
+        ::Thread.current.thread_variable_set(@key_count, the_count - 1)
       end
     else
       raise ConnectionPool::Error, 'no connections are checked out'
