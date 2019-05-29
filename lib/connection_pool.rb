@@ -55,16 +55,16 @@ class ConnectionPool
   end
 
   def with(options = {})
-    Thread.handle_interrupt(Exception => :never) do
+    #Thread.handle_interrupt(Exception => :never) do
       conn = checkout(options)
       begin
-        Thread.handle_interrupt(Exception => :immediate) do
+        #Thread.handle_interrupt(Exception => :immediate) do
           yield conn
-        end
+        #end
       ensure
         checkin
       end
-    end
+    #end
   end
 
   def checkout(options = {})
