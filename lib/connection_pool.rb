@@ -79,6 +79,7 @@ class ConnectionPool
   end
 
   def checkin
+    puts "ERROR-"*15 unless ::Thread.current[@key]
     puts "Thread #{Thread.current.object_id} checking IN (current count is #{::Thread.current[@key_count]})"
     if ::Thread.current[@key]
       if ::Thread.current[@key_count] == 1
