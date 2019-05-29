@@ -68,7 +68,7 @@ class ConnectionPool
   end
 
   def checkout(options = {})
-    puts "Thread #{Thread.current.object_id} checking OUT (current count is #{::Thread.current[@key_count]})"
+    #puts "Thread #{Thread.current.object_id} checking OUT (current count is #{::Thread.current[@key_count]})"
     if ::Thread.current[@key]
       ::Thread.current[@key_count] += 1
       ::Thread.current[@key]
@@ -80,7 +80,8 @@ class ConnectionPool
 
   def checkin
     puts "ERROR-"*15 unless ::Thread.current[@key]
-    puts "Thread #{Thread.current.object_id} checking IN (current count is #{::Thread.current[@key_count]})"
+    puts caller.join("\n") unless ::Thread.current[@key]
+    #puts "Thread #{Thread.current.object_id} checking IN (current count is #{::Thread.current[@key_count]})"
     if ::Thread.current[@key]
       if ::Thread.current[@key_count] == 1
         @available.push(::Thread.current[@key])
