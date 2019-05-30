@@ -82,7 +82,7 @@ class ConnectionPool
   def checkin
     unless ::Thread.current.thread_variable_get(@key)
       puts "ERROR-"*15 
-      puts "Thread #{::Thread.current} :: #{::Thread.current.object_id} :: #{::NamedThread.current.name}"
+      puts "Thread #{::Thread.current} :: #{::Thread.current.object_id} :: #{::Thread.current.thread_variable_get(:name)}"
       puts caller.join("\n")
       puts
     end
